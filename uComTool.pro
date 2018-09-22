@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -29,6 +29,3 @@ SOURCES += \
 
 HEADERS += \
         uComTool.h
-
-FORMS += \
-        uComTool.ui
