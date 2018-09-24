@@ -25,7 +25,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        uComTool.cpp
+        uComTool.cpp \
+        comboBox.cpp \
+    shellWidget.cpp \
+    IOEdit.cpp
 
 HEADERS += \
-        uComTool.h
+        uComTool.h \
+        comboBox.h \
+    shellWidget.h \
+    IOEdit.h

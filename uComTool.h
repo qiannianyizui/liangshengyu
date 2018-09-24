@@ -8,9 +8,10 @@ class QSplitter;
 class QPushButton;
 class QComboBox;
 class QLabel;
-class QTextEdit;
 class QGridLayout;
 class QTimer;
+class comboBox;
+class shellWidget;
 class uComTool : public QMainWindow
 {
     Q_OBJECT
@@ -19,18 +20,29 @@ public:
     explicit uComTool(QWidget *parent = 0);
     ~uComTool();
 
+signals:
+    void ReadFinished(QString data);
+
 protected:
     void Initialize(QGridLayout *layout);
-    void ControlTimer(bool checked);
+    bool ControlPort(bool checked);
+    void SetBaudRate();
+    void SetDataBits();
+    void SetStopBits();
+    void SetParity();
+    void SetFlowControl();
 
 protected slots:
     void ScanPort();
     void ChgCtrChecked(bool checked);
+    void ReadData();
+    void WriteData(QString cmd);
+    void GetCmd(QString cmd);
 
 private:
     QSerialPort    *m_cSerialPort;
     QSplitter      *m_cSplitter;
-    QComboBox      *m_cComComboBox;
+    comboBox       *m_cComComboBox;
     QComboBox      *m_cBaudrateComboBox;
     QComboBox      *m_cDataBitsComboBox;
     QComboBox      *m_cStopBitsComboBox;
@@ -44,9 +56,8 @@ private:
     QLabel         *m_cFlowControlLabel;
     QPushButton    *m_cComControlButton;
     QWidget        *m_cComConfigureWidget;
-    QTextEdit      *m_cIOEdit;
+    shellWidget    *m_cIOWidget;
     QWidget        *m_cMainWidget;
-    QTimer         *m_cPortScanTimer;
 };
 
 #endif // UCOMTOOL_H
