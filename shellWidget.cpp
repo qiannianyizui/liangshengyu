@@ -17,7 +17,7 @@ shellWidget::shellWidget(QWidget *parent) :
     this->appendPlainText("#");
 
     m_cInputEdit = new IOEdit(this->viewport());
-   // m_cInputEdit->setStyleSheet("border-style:none; background-color:transparent;");
+    m_cInputEdit->setStyleSheet("border-style:none; background-color:transparent;");
     connect(m_cInputEdit, SIGNAL(inputControlChar(enum Qt::Key)), this, SLOT(GetEditCmd(enum Qt::Key)));
 
     connect(m_cInputEdit,SIGNAL(textEdited(QString)), this, SLOT(GotoBottom()));
@@ -54,7 +54,7 @@ void shellWidget::UpdateEditPosition()
 {
     QRectF rect = this->blockBoundingGeometry(this->document()->lastBlock());
     qDebug() << rect;
-    m_cInputEdit->move(rect.topRight().toPoint());
+    m_cInputEdit->move(rect.topLeft().toPoint().x() + this->font().pointSize()*1.3, rect.topLeft().toPoint().y());
     m_cInputEdit->resize(this->viewport()->size().width(), rect.height());
     m_cInputEdit->setFocus();
 }
