@@ -3,66 +3,121 @@
 #include <QScrollBar>
 #include <QMouseEvent>
 #include <QKeyEvent>
-#include "IOEdit.h"
 #include "shellWidget.h"
 
-shellWidget::shellWidget(QWidget *parent) :
-    QPlainTextEdit(parent)
+shellWidget::shellWidget(QWidget *parent)
+: QPlainTextEdit(parent),
+  m_iCursorPosition(0),
+  m_bEchoFlag(false)
 {
-    this->setReadOnly(true);
 
-    QFont font = this->font();
-    font.setPointSize(font.pointSize()+2);
-    this->setFont(font);
-    this->appendPlainText("#");
-
-    m_cInputEdit = new IOEdit(this->viewport());
-    m_cInputEdit->setStyleSheet("border-style:none; background-color:transparent;");
-    connect(m_cInputEdit, SIGNAL(inputControlChar(enum Qt::Key)), this, SLOT(GetEditCmd(enum Qt::Key)));
-
-    connect(m_cInputEdit,SIGNAL(textEdited(QString)), this, SLOT(GotoBottom()));
-    connect(this->verticalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(GotoBottom()));
-
-    m_bEchoFlag = false;
 }
 
 void shellWidget::resizeEvent(QResizeEvent *event)
 {
-    UpdateEditPosition();
-    QPlainTextEdit::resizeEvent(event);
+
 }
 
 void shellWidget::mousePressEvent(QMouseEvent *event)
 {
-    if (Qt::LeftButton == event->buttons())
-    {
-        m_cInputEdit->setFocus();
-    }
-    QPlainTextEdit::mousePressEvent(event);
+
 }
 
-void shellWidget::GotoBottom()
+
+void shellWidget::keyPressEvent(QKeyEvent *event)
 {
-    QScrollBar *scrollbar = this->verticalScrollBar();
-    if (scrollbar)
+    static QString cmd = tr("");
+    if( (event->modifiers() == Qt::ControlModifier) && (event->key()) == Qt::Key_C )
     {
-        scrollbar->setSliderPosition(scrollbar->maximum());
+        this->insertPlainText("\n");
+        inputFinished("\n");
+        m_iCursorPosition = 0;
+        m_bEchoFlag = true;
+        cmd.clear();
+        return;
     }
+
+    switch(event->key())
+    {
+    case Qt::Key_Return:
+        cmd = cmd + "\n";
+        this->insertPlainText("\n");
+        inputFinished(cmd);
+        cmd.clear();
+        m_iCursorPosition = 0;
+        m_bEchoFlag = true;
+        return;
+        break;
+    case Qt::Key_Left:
+        if( m_iCursorPosition > 0 )
+        {
+            m_iCursorPosition = m_iCursorPosition - 1;
+            this->moveCursor(QTextCursor::PreviousCharacter);
+        }
+        return;
+        break;
+    case Qt::Key_Right:
+        if( m_iCursorPosition < cmd.length())
+        {
+            m_iCursorPosition = m_iCursorPosition + 1;
+            this->moveCursor(QTextCursor::NextCharacter);
+        }
+        return;
+        break;
+    case Qt::Key_Up:
+        //inputFinished());
+        return;
+        break;
+    case Qt::Key_Down:
+        return;
+        break;
+    case Qt::Key_Backspace:
+        if( m_iCursorPosition <= 0 )
+        {
+            return;
+        }
+        cmd = cmd.remove(m_iCursorPosition - 1, 1);
+        m_iCursorPosition = m_iCursorPosition - 1;
+        break;
+    case Qt::Key_Control:
+        return;
+        break;
+    case Qt::Key_Tab:
+        cmd = cmd + "\t";
+        inputFinished(cmd);
+        cmd.clear();
+        m_iCursorPosition = 0;
+        m_bEchoFlag = true;
+        return;
+        break;
+    case Qt::Key_Space:
+        cmd = cmd + " ";
+        m_iCursorPosition = m_iCursorPosition + 1;
+        break;
+    default:
+        cmd = cmd + event->text();
+        m_iCursorPosition = m_iCursorPosition + 1;
+        break;
+    }
+    QPlainTextEdit::keyPressEvent(event);
 }
 
-void shellWidget::UpdateEditPosition()
+void shellWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    QRectF rect = this->blockBoundingGeometry(this->document()->lastBlock());
-    qDebug() << rect;
-    m_cInputEdit->move(rect.topLeft().toPoint().x() + this->font().pointSize()*1.3, rect.topLeft().toPoint().y());
-    m_cInputEdit->resize(this->viewport()->size().width(), rect.height());
-    m_cInputEdit->setFocus();
+
+}
+
+void shellWidget::GoToBottom()
+{
+    QScrollBar *bar = this->verticalScrollBar();
+    bar->setSliderPosition(bar->maximum());
 }
 
 void shellWidget::SwitchNewLine(QString data)
 {
-    if (m_bEchoFlag == false && data == m_cPrevCmd)
+    if( true == m_bEchoFlag )
     {
+        m_bEchoFlag = 0;
         return;
     }
     int count = data.count("\n");
@@ -73,28 +128,5 @@ void shellWidget::SwitchNewLine(QString data)
         this->insertPlainText(lineText + "\n");
     }
     this->insertPlainText(data.section("\n", count, count));
-    UpdateEditPosition();
-}
-
-void shellWidget::GetEditCmd(enum Qt::Key code)
-{
-    QString cmd = m_cInputEdit->text();
-    m_cPrevCmd = cmd + "\r\n";
-    switch (code)
-    {
-    case Qt::Key_Tab:
-        cmd = cmd + "\t";
-        break;
-    case Qt::Key_Return:
-        m_cInputEdit->clear();
-        this->moveCursor(QTextCursor::End);
-        this->insertPlainText(cmd);
-        this->appendPlainText("#");
-        UpdateEditPosition();
-        cmd = cmd + "\n";
-        break;
-    default:
-        break;
-    }
-    emit inputFinished(cmd);
+    GoToBottom();
 }

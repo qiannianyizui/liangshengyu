@@ -3,7 +3,6 @@
 
 #include <QPlainTextEdit>
 
-class IOEdit;
 class shellWidget:public QPlainTextEdit
 {
     Q_OBJECT
@@ -13,20 +12,19 @@ public:
 protected:
     void resizeEvent(QResizeEvent *event);
     void mousePressEvent(QMouseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
+    void GoToBottom();
 
 signals:
     void inputFinished(QString);
 
 private slots:
-    void GotoBottom();
-    void UpdateEditPosition();
     void SwitchNewLine(QString data);
-    void GetEditCmd(Qt::Key code);
 
 private:
-    IOEdit * m_cInputEdit;
+    int m_iCursorPosition;
     bool m_bEchoFlag;
-    QString m_cPrevCmd;
 };
 
 #endif // SHELLDEMO_H

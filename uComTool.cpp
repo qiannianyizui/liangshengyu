@@ -1,4 +1,3 @@
-#include <QSerialPort>
 #include <QSerialPortInfo>
 #include <QSplitter>
 #include <QComboBox>
@@ -11,8 +10,8 @@
 #include "shellWidget.h"
 #include "uComTool.h"
 
-uComTool::uComTool(QWidget *parent) :
-    QMainWindow(parent)
+uComTool::uComTool(QWidget *parent)
+: QMainWindow(parent)
 {
     QGridLayout *mainWidgetLayout = new QGridLayout;
     m_cMainWidget = new QWidget;
@@ -48,6 +47,7 @@ void uComTool::Initialize(QGridLayout *layout)
     m_cIOWidget             = new shellWidget;
 
     connect(m_cSerialPort, SIGNAL(readyRead()), this, SLOT(ReadData()));
+    connect(m_cSerialPort, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(Handle(QSerialPort::SerialPortError)));
 
     connect(m_cComComboBox, SIGNAL(clicked()), this, SLOT(ScanPort()));
 
@@ -259,6 +259,7 @@ void uComTool::ChgCtrChecked(bool checked)
     if (false == ControlPort(checked))
     {
         m_cComControlButton->setText(tr("打开"));
+        m_cComControlButton->setChecked(false);
     }
 }
 
@@ -278,4 +279,9 @@ void uComTool::WriteData(QString cmd)
 void uComTool::GetCmd(QString cmd)
 {
     WriteData(cmd);
+}
+
+void uComTool::Handle(QSerialPort::SerialPortError error)
+{
+    qDebug() << error;
 }

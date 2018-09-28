@@ -27,11 +27,9 @@ SOURCES += \
         main.cpp \
         uComTool.cpp \
         comboBox.cpp \
-    shellWidget.cpp \
-    IOEdit.cpp
+    shellWidget.cpp
 
 HEADERS += \
         uComTool.h \
         comboBox.h \
-    shellWidget.h \
-    IOEdit.h
+    shellWidget.h

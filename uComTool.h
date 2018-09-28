@@ -2,8 +2,8 @@
 #define UCOMTOOL_H
 
 #include <QMainWindow>
+#include <QSerialPort>
 
-class QSerialPort;
 class QSplitter;
 class QPushButton;
 class QComboBox;
@@ -38,6 +38,7 @@ protected slots:
     void ReadData();
     void WriteData(QString cmd);
     void GetCmd(QString cmd);
+    void Handle(QSerialPort::SerialPortError error);
 
 private:
     QSerialPort    *m_cSerialPort;
