@@ -24,7 +24,7 @@ private slots:
 
 private:
     int m_iCursorPosition;
-    bool m_bEchoFlag;
+    int m_bEchoFlag;
 };
 
 #endif // SHELLDEMO_H

@@ -8,7 +8,7 @@
 shellWidget::shellWidget(QWidget *parent)
 : QPlainTextEdit(parent),
   m_iCursorPosition(0),
-  m_bEchoFlag(false)
+  m_bEchoFlag(0)
 {
 
 }
@@ -32,7 +32,7 @@ void shellWidget::keyPressEvent(QKeyEvent *event)
         this->insertPlainText("\n");
         inputFinished("\n");
         m_iCursorPosition = 0;
-        m_bEchoFlag = true;
+        m_bEchoFlag = 1;
         cmd.clear();
         return;
     }
@@ -45,7 +45,7 @@ void shellWidget::keyPressEvent(QKeyEvent *event)
         inputFinished(cmd);
         cmd.clear();
         m_iCursorPosition = 0;
-        m_bEchoFlag = true;
+        m_bEchoFlag = 1;
         return;
         break;
     case Qt::Key_Left:
@@ -85,9 +85,9 @@ void shellWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Tab:
         cmd = cmd + "\t";
         inputFinished(cmd);
-        cmd.clear();
-        m_iCursorPosition = 0;
-        m_bEchoFlag = true;
+       //cmd.clear();
+       //m_iCursorPosition = 0;
+        m_bEchoFlag = 2;
         return;
         break;
     case Qt::Key_Space:
@@ -115,9 +115,10 @@ void shellWidget::GoToBottom()
 
 void shellWidget::SwitchNewLine(QString data)
 {
-    if( true == m_bEchoFlag )
+    qDebug() << data;
+    if( m_bEchoFlag > 0 )
     {
-        m_bEchoFlag = 0;
+        m_bEchoFlag--;
         return;
     }
     int count = data.count("\n");
